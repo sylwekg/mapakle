@@ -1,0 +1,26 @@
+<h1>MENU</h1>
+<h1>MOZE jakis SLIDER</h1>
+
+
+
+<div>
+    <button id="add"> Add point </button>
+    <input type="text" id="lat" name="lat" placeholder="lat" value="52">
+    <input type="text" id="lon" name="lon" placeholder="lon" value="20">
+</div>
+<div id="map"></div>
+
+<!--<div id="form" hidden>-->
+    <!--<table>-->
+        <!--<tr><td>Name:</td> <td><input type='text' id='name'/> </td> </tr>-->
+        <!--<tr><td>User:</td> <td><input type='text' id='user'/> </td> </tr>-->
+
+        <!--<tr><td></td><td><input type='button' value='Save' onclick='saveData()'/></td></tr>-->
+    <!--</table>-->
+<!--</div>-->
+
+<div id="message">Location saved</div>
+
+<script src="javascripts/client.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4ZnBvhjP2t7BW26TiADLu9TIVc5zhMPU&callback=initMap"
+        async defer></script>
