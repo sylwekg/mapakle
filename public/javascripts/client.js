@@ -1,23 +1,27 @@
 
+
+// ===================== Cala obsługa mapy ===========================================================================
     var marker;
     var markers=[];
     var map, mapa;
     var infowindow;
     var messagewindow;
     var newDiv;
+    var HOST_URL = "http://192.168.1.102:3000";
+
+    var messageWindow ="<div id='form'> <table>";
+    messageWindow+="<tr><td>Name:</td> <td><input type='text' id='name'/> </td> </tr>";
+    messageWindow+="<tr><td>Xser:</td> <td><input type='text' id='user'/> </td> </tr>";
+    messageWindow+="<tr><td></td><td><input id='saveButton' type='button' value='Save' /></td></tr>";
+    messageWindow+="</table> </div>";
+
+    newDiv = document.createElement("div");
+    newDiv.innerHTML=messageWindow;
 
 
-    function initMap() {
+
+function initMap() {
         var myLatLng = {lat: 51.9194, lng: 19.1451}; //środek polski
-
-
-
-        var messageWindow ="<div id='form'> <table>";
-            messageWindow+="<tr><td>Name:</td> <td><input type='text' id='name'/> </td> </tr>";
-            messageWindow+="<tr><td>Xser:</td> <td><input type='text' id='user'/> </td> </tr>";
-            messageWindow+="<tr><td></td><td><input id='saveButton' type='button' value='Save' /></td></tr>";
-            messageWindow+="</table> </div>";
-
 
         // Create a map object and specify the DOM element for display.
         map = new google.maps.Map(document.getElementById('map'), {
@@ -25,6 +29,10 @@
             //scrollwheel: false,
             zoom: 6
         });
+
+        mapa = document.getElementById('map');
+        mapa.appendChild(newDiv);
+
 
         var mapArea;
         google.maps.event.addListener(map,'idle' , function (event) {
@@ -66,13 +74,11 @@
 
 
             google.maps.event.addListener(marker, 'click', function (event) {
-                console.log('kliknales w marker',marker);
-                console.log('kliknales w event',event);
+                //console.log('kliknales w marker',marker);
+                //console.log('kliknales w event',event);
 
                 mapa = document.getElementById('map');
 
-                newDiv = document.createElement("div");
-                newDiv.innerHTML=messageWindow;
                 mapa.appendChild(newDiv);
                 if(infowindow)
                     infowindow.close();
@@ -92,13 +98,13 @@
                 });
             });
         });
-    }
+   }
 
 
 
     function getData(id) {
         return new Promise(function(resolve, reject) {
-            $.get("http://localhost:3000/getPoint" ,{"id": id}  )
+            $.get("/getPoint" ,{"id": id}  )
                 .done(function (data) {
                     console.log("Data Loaded: " + JSON.stringify(data));
                     resolve(data);
@@ -112,13 +118,13 @@
 
     function getAreaPoints(swlat, swlon, nelat, nelon) {
         return new Promise(function(resolve, reject) {
-            $.get("http://localhost:3000/getAreaPoints" ,{"locsw[]": [swlat,swlon], "locne[]":[nelat,nelon]}  )  // {lat: lat, lon: lon} )
+            $.get("/getAreaPoints" ,{"locsw[]": [swlat,swlon], "locne[]":[nelat,nelon]}  )  // {lat: lat, lon: lon} )
                 .done(function (data) {
                     console.log("Data Loaded: " + JSON.stringify(data));
                     resolve(data);
                 })
                 .fail(function () {
-                    alert("Błąd odczytu danych");
+                    alert("Błąd pobierania danych danych");
                     reject(Error("Błąd odczytu danych"));
                 });
         });
@@ -162,8 +168,9 @@
 
         // interaktywnosc punktu
         google.maps.event.addListener(marker, 'click', function (event) {
-            var mapa = document.getElementById('map');
-            mapa.appendChild(newDiv);
+            //var mapa = document.getElementById('map');
+
+
             if(infowindow)
                 infowindow.close();
             messagewindow.close();
@@ -187,7 +194,7 @@
 
     function saveData(marker) {
         $.ajax({
-            url: "http://localhost:3000/addPoint",
+            url: "/addPoint",
             method: 'POST',
             data: JSON.stringify(
                 {
@@ -212,49 +219,49 @@
         });
     }
 //-------------------------------------------------------------------------------------------------------------
-
-    //funkcja tylko na potrzeby testowe
-    $("#checkArea").click(function() {
-        getAreaPoints($("#swlat").val(), $("#swlon").val(), $("#nelat").val(), $("#nelon").val());
-        //var latLng = new google.maps.LatLng($("#lat").val(), $("#lon").val());
-    });
-
-    //funkcja tylko na potrzeby testowe
-    $("#add").click(function(){
-        var latLng = new google.maps.LatLng($("#lat").val(),$("#lon").val());
-        //marker.push(
-        marker =
-            new google.maps.Marker({
-                map: map,
-                position: latLng
-                //title: point.name
-            });
-
-        $.ajax({
-            url: "http://localhost:3000/addPoint",
-            method: 'POST',
-            data: JSON.stringify(
-                {
-                    name : "Punkt T",
-                    user : "Stanisław",
-                    quality : 0,
-                    geometry : {
-                        type : "Point",
-                        loc : [
-                            $("#lat").val(),
-                            $("#lon").val()
-                        ]
-                    }
-                }),
-            contentType:'application/json'
-            //success: console.log("nowy punkt zapisany w DB")
-        })
-        .done(function (data) {
-            console.log("nowy punkt zapisany w DB");
-            infowindow.close();
-            messagewindow.open(map, marker);
-        })
-        .fail(function (data) {
-            console.log("błąd zapisu w DB");
-        });
-    });
+//
+//     //funkcja tylko na potrzeby testowe
+//     $("#checkArea").click(function() {
+//         getAreaPoints($("#swlat").val(), $("#swlon").val(), $("#nelat").val(), $("#nelon").val());
+//         //var latLng = new google.maps.LatLng($("#lat").val(), $("#lon").val());
+//     });
+//
+//     //funkcja tylko na potrzeby testowe
+//     $("#add").click(function(){
+//         var latLng = new google.maps.LatLng($("#lat").val(),$("#lon").val());
+//         //marker.push(
+//         marker =
+//             new google.maps.Marker({
+//                 map: map,
+//                 position: latLng
+//                 //title: point.name
+//             });
+//
+//         $.ajax({
+//             url: "http://localhost:3000/addPoint",
+//             method: 'POST',
+//             data: JSON.stringify(
+//                 {
+//                     name : "Punkt T",
+//                     user : "Stanisław",
+//                     quality : 0,
+//                     geometry : {
+//                         type : "Point",
+//                         loc : [
+//                             $("#lat").val(),
+//                             $("#lon").val()
+//                         ]
+//                     }
+//                 }),
+//             contentType:'application/json'
+//             //success: console.log("nowy punkt zapisany w DB")
+//         })
+//         .done(function (data) {
+//             console.log("nowy punkt zapisany w DB");
+//             infowindow.close();
+//             messagewindow.open(map, marker);
+//         })
+//         .fail(function (data) {
+//             console.log("błąd zapisu w DB");
+//         });
+//     });

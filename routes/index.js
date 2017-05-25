@@ -12,8 +12,10 @@ router.get('/points', function(req, res, next) {
     // return all points
     Point.find({})
         .exec(function(err, points) {
-            if(err)
+            if(err) {
+                console.log('Test na androida :',err.message);
                 return next(err);
+            }
             res.json(points);
         });
 });

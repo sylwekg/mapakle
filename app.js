@@ -5,19 +5,24 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-
+var expressHbs = require('express-handlebars');
+var handlebars = require('handlebars');
+var dotenv = require('dotenv').config();
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
 
+
 //DB start
 mongoose.connect('localhost:27017/mapakleszczy');
 
+
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+app.engine('.hbs',expressHbs({defaultLayout:'layout', extname:'.hbs'}));
+//app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', '.hbs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -28,6 +33,17 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    if(req.method === "OPTIONS" ) {
+        res.header("Access-Control-Allow-Methods", "GET,PUT,POST");
+        return res.status(200).json({});
+    }
+    next();
+});
+
+console.log(process.env.HOST_URL);
 
 app.use('/', index);
 app.use('/users', users);
