@@ -4,6 +4,9 @@ var Point = require('../models/point');
 var user = require('../models/user');
 var mid = require('../middleware');
 
+var passport = require('passport');
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     return res.render('index', { title: 'MapaKleszczy.pl' });
@@ -21,13 +24,14 @@ router.get('/logout',function (req, res, next) {
 });
 
 router.get('/profile', mid.requiresLogin, function (req, res, next) {
-    user.findById(req.session.userId)
+
+    user.findById(res.locals.currentUser)
         .exec(function (error, user) {
             if(error)
                 return next(error);
             else {
                 console.log(req.session);
-                //req.session.userId = user._id;
+                req.session.userId = user._id;
                 req.session.userName = user.name;
 
                 return res.render('profile', {
@@ -46,6 +50,16 @@ router.get('/login',mid.loggedOut, function (req, res, next) {
     var messages = req.flash('error');
     return res.render('login', { title: 'Login', messages:messages, hasErrors: messages.length>0});
 });
+
+
+router.get('/login/facebook',passport.authenticate('facebook',{scope:'public_profile'}));
+
+router.get('/login/facebook/callback', passport.authenticate('facebook', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
 
 router.post('/login',function(req, res, next){
     if (req.body.email && req.body.password) {

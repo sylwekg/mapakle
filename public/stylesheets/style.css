@@ -78,6 +78,10 @@ a {
   border-top-right-radius: 0;
 }
 
+.fb {
+  margin:auto;
+}
+
 /*  styles for profile  */
 
 .glyphicon {  margin-bottom: 10px;margin-right: 10px;}
